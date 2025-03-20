@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
 	var a [5]int
@@ -21,5 +23,9 @@ func main() {
 		}
 	}
 	fmt.Println("2d:", twoD)
+
+	c1 := make(chan struct{})
+	fmt.Printf("c1:%T\n", c1)
+	fmt.Printf("c1:%#v\n", [3]int{1, 2, 3})
 
 }

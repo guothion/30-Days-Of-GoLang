@@ -20,6 +20,7 @@ func main() {
 	d := make([]int, 5, 6)
 	fmt.Println(cap(d), len(d), d) // 6 5 [0 0 0 0 0]
 	d = append(d, 1)
+	fmt.Println(cap(d), len(d), d) // 6 6  [0 0 0 0 0 1 ]
 	d = append(d, 2)
 	// fmt.Println(d)
 	fmt.Println(cap(d), len(d), d) // 12 7  [0 0 0 0 0 1 2]
@@ -29,10 +30,10 @@ func main() {
 
 	f := make([]int, len(e))
 	copy(f, e)
-	fmt.Println("copy: ", f) // copy:  [1 2 3 4 5]
+	fmt.Println("copy: ", f, cap(f)) // copy:  [1 2 3 4 5]
 
 	l := d[2:5]
-	fmt.Println(l, cap(l))
+	fmt.Println(l, len(l), cap(l))
 
 	//切片再切片
 	a := [...]string{"北京", "上海", "广州", "深圳", "成都", "重庆"}
@@ -42,4 +43,12 @@ func main() {
 	c := b[1:5]
 	fmt.Printf("c:%v type:%T len:%d  cap:%d\n", c, c, len(c), cap(c))
 
+}
+
+func init() {
+	var b map[string]int
+	b = make(map[string]int, 10)
+	b["测试"] = 100
+	fmt.Println(b)
+	fmt.Printf("%T\n", b)
 }
