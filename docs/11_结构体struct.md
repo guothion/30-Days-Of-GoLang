@@ -267,4 +267,136 @@ func main() {
 	p1.Dream()
 }
 ```
-## 指针类型的接收者
+### 指针类型的接收者
+指针类型的接收者由一个结构体的指针组成，由于指针的特性，调用方法时修改接收者指针的任意成员变量，
+在方法结束后，修改都是有效的。这种方式就十分接近于其他语言中面向对象中的`this`或者`self`。
+
+```go
+package main
+
+import "fmt"
+
+type Person struct {
+	name string
+	age  int8
+}
+
+func (p *Person) SetAge(newAge int8) {
+	p.age = newAge
+}
+func NewPerson(name string, age int8) *Person {
+	return &Person{
+		name: name,
+		age:  age,
+	}
+}
+func main() {
+	p1 := NewPerson("测试", 25)
+	fmt.Println(p1.age) // 25
+	p1.SetAge(30)
+	fmt.Println(p1.age) // 30
+}
+```
+### 值类型的接收者
+当方法作用于值类型接收者时，Go语言会在代码运行时将接收者的值**复制一份**。在值类型接收者的方法中可
+以获取接收者的成员值，但修改操作只是针对副本，无法修改接收者变量本身。
+```go
+func (p Person) SetAge2(newAge int8) {
+    p.age = newAge
+}
+
+func main() {
+    p1 := NewPerson("测试", 25)
+    p1.Dream()
+    fmt.Println(p1.age) // 25
+    p1.SetAge2(30) // (*p1).SetAge2(30)
+    fmt.Println(p1.age) // 25
+}
+```
+> 什么时候应该使用指针类型接收者?
+> - 1.需要修改接收者中的值
+> - 2.接收者是拷贝代价比较大的大对象
+> - 3.保证一致性，如果有某个方法使用了指针接收者，那么其他的方法也应该使用指针接收者。
+
+## 结构体匿名字段
+结构体允许其成员字段在声明时没有字段名而只有类型，这种没有名字的字段就称为匿名字段。
+
+匿名字段默认采用类型名作为字段名，结构体要求字段名称必须唯一，因此一个结构体中同种类型的匿名字段只能有一个。
+```go
+package main
+//Person 结构体Person类型
+type Person struct {
+	string  // 只是给了类型
+	int
+}
+
+func main() {
+	p1 := Person{
+		"pprof.cn",
+		18,
+	}
+	fmt.Printf("%#v\n", p1)        //main.Person{string:"pprof.cn", int:18}
+	fmt.Println(p1.string, p1.int) //pprof.cn 18
+}
+```
+## 嵌套结构体
+```go
+package main
+type Address struct {
+    Province   string
+    City       string
+    CreateTime string
+}
+
+//Email 邮箱结构体
+type Email struct {
+    Account    string
+    CreateTime string
+}
+
+//User 用户结构体
+type User struct {
+    Name   string
+    Gender string
+    Address
+    Email
+}
+```
+## 结构体的"继承"
+Go语言中使用结构体也可以实现其他编程语言中面向对象的继承。
+
+这块看的就和TypeScript中的类型继承很像，似乎有异曲同工之处。
+
+```go
+package main
+
+import "fmt"
+
+type Animal struct {
+	name string
+}
+
+func (a *Animal) move() {
+	fmt.Printf("%s会动！\n",a.name)
+}
+
+type Dog struct {
+	Feet    int8
+	*Animal // 通过嵌套匿名结构体来实现继承
+}
+
+func (d *Dog) wang() {
+	fmt.Printf("%s会汪汪汪~\n", d.name)
+}
+
+func main() {
+	d1 := &Dog{
+		Feet: 4,
+		Animal: &Animal{ //注意嵌套的是结构体指针
+			name: "乐乐",
+		},
+	}
+	d1.wang() //乐乐会汪汪汪~
+	d1.move() //乐乐会动！
+}
+```
